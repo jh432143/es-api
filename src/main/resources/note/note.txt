@@ -1,0 +1,46 @@
+도커 공인 ip 확인
+docker-machine ip default
+docker-machine ls
+docker ip : 192.168.99.100
+
+
+1. docker machine 재시작
+docker-machine restart
+
+2. systemctl 문제로 centos설치
+docker run --privileged -d --name centos -p 9200:9200 centos:7 init
+docker run --net=host --privileged -d --name centos -p 9201:9200 centos:7 init
+docker run --privileged -d --name centos -p 192.168.99.100:9200:9200 centos:7 init
+docker exec -it centos bash
+
+3. jvm 설치 (elasticsearch는 jvm환경에서 동작)
+yum install -y java-1.8.0-openjdk-devel.x86_64
+
+4. ES 저장소 생성
+vi /etc/yum.repos.d/elasticsearch.repo
+
+[elasticsearch-6.x]
+name=Elasticsearch repository for 6.x packages
+baseurl=https://artifacts.elastic.co/packages/6.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
+
+5. ES 설치
+yum install -y elasticsearch-6.6.2
+
+6. 서비스 등록
+systemctl enable elasticsearch
+systemctl start elasticsearch
+
+7. 설치확인
+curl -X GET 'localhost:9200'
+
+8. 컨테이너 정보확인
+docker inspect centos
+
+...
+
+.. 도커 툴박스로 하려니.. port포워딩이 여간어려워.. windows ES로 해버림..
